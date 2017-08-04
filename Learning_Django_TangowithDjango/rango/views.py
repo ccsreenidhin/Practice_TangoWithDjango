@@ -190,6 +190,17 @@ def user_login(request):
         
         
 
+@login_required
+def user_logout(request):
+    logout(request)
+    return HttpResponseRedirect('/rango/')
+    
+    
+@login_required
+def restricted(request):
+    return render(request, 'rango/restricted.html', {})
+            
+
 def search(request):
 
     result_list = []
@@ -204,3 +215,19 @@ def search(request):
     return render(request, 'rango/search.html', {'result_list': result_list})
     
 
+@login_required
+def like_category(request):
+
+    cat_id = None
+    if request.method == 'GET':
+        cat_id = request.GET['category_id']
+
+    likes = 0
+    if cat_id:
+        cat = Category.objects.get(id=int(cat_id))
+        if cat:
+            likes = cat.likes + 1
+            cat.likes =  likes
+            cat.save()
+
+    return HttpResponse(likes)
